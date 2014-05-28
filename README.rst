@@ -1,11 +1,11 @@
 Django Login over Token
 =======================
 
-.. image:: https://travis-ci.org/jespino/django-lot.png?branch=master
-    :target: https://travis-ci.org/jespino/django-lot
+.. image:: https://travis-ci.org/funkybob/django-lot.png?branch=master
+    :target: https://travis-ci.org/funkybob/django-lot
 
-.. image:: https://coveralls.io/repos/jespino/django-lot/badge.png?branch=master
-    :target: https://coveralls.io/r/jespino/django-lot?branch=master
+.. image:: https://coveralls.io/repos/funkybob/django-lot/badge.png?branch=master
+    :target: https://coveralls.io/r/funkybob/django-lot?branch=master
 
 .. image:: https://pypip.in/v/django-lot/badge.png
     :target: https://crate.io/packages/django-lot
@@ -20,21 +20,11 @@ your settings.
 How to install
 --------------
 
-You can also install it with: ``pip install django-lot``
+Currently, as this is a branch, you will need: ``pip install git+https://github.com/funkybob/django-lot.git``
 
 
 Configuration
 -------------
-
-Add the lot authentication backend to the :code:`AUTHENTICATION_BACKENDS`
-settings variable.
-
-Example::
-
-  AUTHENTICATION_BACKENDS = (
-      "django.contrib.auth.backends.ModelBackend",
-      "lot.auth_backend.LOTBackend",
-  )
 
 Add the lot app to your installed apps and define your settings :code:`LOT`
 variable as a dictionary and :code:`LOT_MIDDLEWARE_PARAM_NAME` if you use the
@@ -61,6 +51,41 @@ Example::
   }
 
   LOT_MIDDLEWARE_PARAM_NAME = 'uuid-login'
+
+GET key
+-------
+
+Add the lot authentication backend to the :code:`AUTHENTICATION_BACKENDS`
+settings variable.
+
+Example::
+
+  AUTHENTICATION_BACKENDS = (
+      "django.contrib.auth.backends.ModelBackend",
+      "lot.auth_backend.LOTBackend",
+  )
+
+
+Header Key
+----------
+
+Add the lot authentication middleware to the :code:`MIDDLEWARE_CLASSES`
+settings variable.  Ensure it is __after__ Django's AuthenticationMiddleware.
+
+Example::
+
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'lot.middleware.LOTAuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    )
+
+WARNING::
+
+   This method should ONLY be used over HTTPS.
 
 Usage
 -----
