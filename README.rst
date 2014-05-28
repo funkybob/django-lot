@@ -83,7 +83,7 @@ Example::
         'django.contrib.messages.middleware.MessageMiddleware',
     )
 
-WARNING::
+warning::
 
    This method should ONLY be used over HTTPS.
 
