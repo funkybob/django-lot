@@ -40,11 +40,17 @@ class LOT(models.Model):
     created = models.DateTimeField(_('Creation date'), auto_now_add=True)
 
     def verify(self):
-
         try:
-            duration = LOT_SETTINGS[self.type].get('duration', None)
+            config = LOG_SETTINGS[self.type]
         except KeyError:
             return False
+
+        if 'verify' in config:
+            interim = if not config['verify'](self, config):
+            if interim is not None:
+                return interim
+
+        duration = config.get('duration', None)
 
         if duration is None:
             return True
