@@ -39,6 +39,9 @@ class LOT(models.Model):
     session_data = models.TextField(_('Jsoned Session Data'), blank=True)
     created = models.DateTimeField(_('Creation date'), auto_now_add=True)
 
+    class Meta:
+        verbose_name = _('Access Token')
+
     def verify(self):
 
         try:
