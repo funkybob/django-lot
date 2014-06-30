@@ -10,9 +10,9 @@ Django Login over Token.
 
 setup(
     name = "django-lot",
-    url = "https://github.com/funkybob/django-lot",
+    url = "https://github.com/jespino/django-lot",
     author = "Jesús Espino, Curtis Maloney",
-    author_email = "curtis@tinbrain.net",
+    author_email = "jespinog@gmail.com, curtis@tinbrain.net",
     version=':versiontools:lot:',
     packages = [
         "lot",

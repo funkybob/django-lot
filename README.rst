@@ -48,6 +48,13 @@ Example::
         'one-time': False,
         'duration': None,
     },
+    'morning-login': {
+        'name': _(u'Morning login'),
+        'one-time': False,
+        'duration': None,
+        'verify-func': lambda x: datetime.now().hour < 12,
+        'delete-on-fail': False
+    },
   }
 
   LOT_MIDDLEWARE_PARAM_NAME = 'uuid-login'

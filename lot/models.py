@@ -43,10 +43,15 @@ class LOT(models.Model):
         verbose_name = _('Access Token')
 
     def verify(self):
+        if self.type not in LOT_SETTINGS:
+            return False
 
-        try:
-            duration = LOT_SETTINGS[self.type].get('duration', None)
-        except KeyError:
+        verify_setting = LOT_SETTINGS[self.type]
+
+        duration = verify_setting.get('duration', None)
+        verify_func = verify_setting.get('verify-func', lambda x: True)
+
+        if not verify_func(self):
             return False
 
         if duration is None:
@@ -54,13 +59,19 @@ class LOT(models.Model):
 
         return (now() - self.created).total_seconds() < duration
 
+    def delete_on_fail(self):
+        if self.type not in LOT_SETTINGS:
+            return True
+
+        return LOT_SETTINGS[self.type].get('delete-on-fail', True)
+
     def is_one_time(self):
         return LOT_SETTINGS.get(self.type, {}).get('one-time', False)
 
     def save(self, *args, **kwargs):
         if self.id and not kwargs.pop('force_modification', False):
             raise Exception('Modification not allowed without '
-                            'force_modification parameter on save)')
+                            'force_modification parameter on save.')
         self.uuid = uuid4()
         super(LOT, self).save(*args, **kwargs)
 

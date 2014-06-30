@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 
 from lot.models import LOT
+import lot.models
 
 call_command('syncdb', interactive=False)
 
@@ -27,22 +28,34 @@ class TestLOTBase(unittest.TestCase):
         LOT.objects.all().delete()
 
         test_user = get_user_model().objects.create(username="test")
-        cls.lot1 =LOT.objects.create(
-                user=test_user,
-                type="fast-login",
+        cls.lot1 = LOT.objects.create(
+            user=test_user,
+            type="fast-login",
         )
-        cls.lot2 =LOT.objects.create(
-                user=test_user,
-                type="slow-login",
+        cls.lot2 = LOT.objects.create(
+            user=test_user,
+            type="slow-login",
         )
-        cls.lot3 =LOT.objects.create(
-                user=test_user,
-                type="always-login",
+        cls.lot3 = LOT.objects.create(
+            user=test_user,
+            type="always-login",
         )
-        cls.lot4 =LOT.objects.create(
-                user=test_user,
-                type="always-login",
-                session_data=json.dumps({'data':'test'}),
+        cls.lot4 = LOT.objects.create(
+            user=test_user,
+            type="always-login",
+            session_data=json.dumps({'data':'test'}),
+        )
+
+        lot.models.LOT_SETTINGS['with-session-data-login'] = {
+            'name': 'with session data login',
+            'one-time': False,
+            'duration': None,
+            'verify-func': lambda x: len(x.session_data) != 0,
+            'delete-on-fail': False
+        }
+        cls.lot5 = LOT.objects.create(
+            user=test_user,
+            type="with-session-data-login",
         )
 
 
@@ -248,8 +261,20 @@ class TestLOTModel(TestLOTBase):
         self.assertFalse(self.lot2.verify())
         self.assertTrue(self.lot3.verify())
 
+        # Testing verify func on LOT configuration
+        self.assertFalse(self.lot5.verify())
+        self.lot5.session_data = "test"
+        self.assertTrue(self.lot5.verify())
+
     def test_lot_model_is_one_time(self):
         self.assertTrue(self.lot1.is_one_time())
         self.assertFalse(self.lot2.is_one_time())
         self.assertFalse(self.lot3.is_one_time())
         self.assertFalse(self.lot4.is_one_time())
+
+    def test_lot_model_delete_on_fail(self):
+        self.assertTrue(self.lot1.delete_on_fail())
+        self.assertTrue(self.lot2.delete_on_fail())
+        self.assertTrue(self.lot3.delete_on_fail())
+        self.assertTrue(self.lot4.delete_on_fail())
+        self.assertFalse(self.lot5.delete_on_fail())
